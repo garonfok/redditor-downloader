@@ -1,0 +1,20 @@
+[tool.poetry]
+name = "redditor-downloader"
+version = "0.1.0"
+description = "Scrapes a redditor's post history and downloads all images, gifs, and videos"
+authors = ["Garon Fok <fokgaron@gmail.com>"]
+license = "MIT"
+
+[tool.poetry.dependencies]
+python = "^3.9"
+praw = "^7.4.0"
+requests = "^2.26.0"
+python-dotenv = "^0.19.1"
+yt-dlp = "^2021.10.22"
+
+[tool.poetry.dev-dependencies]
+black = {version = "^21.10b0", allow-prereleases = true}
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
