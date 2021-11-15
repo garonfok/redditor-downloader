@@ -157,7 +157,7 @@ class RedditorDownloader:
         print(f'Validating username "{self.username}"...')
         try:
             self.reddit.redditor(self.username).id
-            print(f'Username "{self.username}" is valid.\n')
+            print(f'Username "{self.username}" is valid.')
             return
         except Exception as e:
             print(f"Error: Invalid username.")

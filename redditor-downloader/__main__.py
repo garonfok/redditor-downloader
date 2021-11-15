@@ -41,8 +41,12 @@ if __name__ == "__main__":
         client.validate_username()
         client.validate_dir()
 
+    print()
+
     while(True):
         for redditor in redditors:
+            print(f"Downloading u/{redditor}'s submissions...")
+
             client = RedditorDownloader(redditor, chosen_dir)
 
             if not any([args.images, args.gifv, args.videos]):
@@ -53,6 +57,8 @@ if __name__ == "__main__":
                 client.download_gifv()
             if args.videos:
                 client.download_videos()
+
+            print(f"Finished downloading u/{redditor}'s submissions.\n")
 
         if not args.continuous:
             break
