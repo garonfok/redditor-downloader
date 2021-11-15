@@ -29,7 +29,11 @@ if __name__ == "__main__":
         "-V", "--videos", help="download videos only", action="store_true"
     )
     parser.add_argument(
-        "-c", "--continuous", metavar="SECONDS", type=int, help="run this program continuously, waiting for a given number of seconds in between cycles",
+        "-c",
+        "--continuous",
+        metavar="SECONDS",
+        type=int,
+        help="run this program continuously, waiting for a given number of seconds in between cycles",
     )
     args = parser.parse_args()
 
@@ -43,7 +47,7 @@ if __name__ == "__main__":
 
     print()
 
-    while(True):
+    while True:
         for redditor in redditors:
             print(f"Downloading u/{redditor}'s submissions...")
 
