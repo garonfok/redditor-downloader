@@ -29,7 +29,7 @@ if __name__ == "__main__":
         "-V", "--videos", help="download videos only", action="store_true"
     )
     parser.add_argument(
-        "-c", "--continuous", help="run this program forever", action="store_true"
+        "-c", "--continuous", metavar="SECONDS", type=int, help="run this program continuously, waiting for a given number of seconds in between cycles",
     )
     args = parser.parse_args()
 
@@ -56,5 +56,5 @@ if __name__ == "__main__":
         if not args.continuous:
             break
         else:
-            print("Sleeping for 5 minutes...")
-            time.sleep(300) # 5 minutes
+            print(f"Sleeping for {args.continuous} seconds...")
+            time.sleep(args.continuous)
