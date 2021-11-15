@@ -37,12 +37,13 @@ if __name__ == "__main__":
     redditors = args.username
 
     for redditor in redditors:
-        RedditorDownloader(redditor, chosen_dir).validate_username()
+        client = RedditorDownloader(redditor, chosen_dir)
+        client.validate_username()
+        client.validate_dir()
 
     while(True):
         for redditor in redditors:
             client = RedditorDownloader(redditor, chosen_dir)
-            client.validate_dir()
 
             if not any([args.images, args.gifv, args.videos]):
                 client.download_all()
