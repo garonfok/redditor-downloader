@@ -10,7 +10,9 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(
         description="Downloads all of a reddit user's image/video submissions."
     )
-    parser.add_argument("username", help="the username of the reddit user to download.")
+    parser.add_argument(
+        "username", nargs="+", help="the username(s) of the reddit user to download."
+    )
     parser.add_argument(
         "-p",
         "--path",
@@ -32,23 +34,24 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     chosen_dir = args.path
-    redditor = args.username
+    redditors = args.username
 
-    RedditorDownloader(redditor, chosen_dir).validate_username()
-
-    client = RedditorDownloader(redditor, chosen_dir)
-
-    client.validate_dir()
+    for redditor in redditors:
+        RedditorDownloader(redditor, chosen_dir).validate_username()
 
     while(True):
-        if not any([args.images, args.gifv, args.videos]):
-            client.download_all()
-        if args.images:
-            client.download_images()
-        if args.gifv:
-            client.download_gifv()
-        if args.videos:
-            client.download_videos()
+        for redditor in redditors:
+            client = RedditorDownloader(redditor, chosen_dir)
+            client.validate_dir()
+
+            if not any([args.images, args.gifv, args.videos]):
+                client.download_all()
+            if args.images:
+                client.download_images()
+            if args.gifv:
+                client.download_gifv()
+            if args.videos:
+                client.download_videos()
 
         if not args.continuous:
             break
