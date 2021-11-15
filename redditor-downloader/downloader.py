@@ -9,6 +9,7 @@ from hashlib import md5
 
 load_dotenv()
 
+
 class RedditorDownloader:
     def __init__(self, username, download_dir):
         self.username = username
@@ -20,7 +21,6 @@ class RedditorDownloader:
             user_agent=os.environ.get("REDDIT_USER_AGENT"),
             username=os.environ.get("REDDIT_USERNAME"),
         )
-
 
     def download_images(self):
         print("Fetching images...")
@@ -59,7 +59,7 @@ class RedditorDownloader:
                         with open(f"{self.download_dir}/downloads.log", "a") as f:
                             f.write(f"{submission.url}\n")
                     temp_log.append(submission.url)
-        print(f"\nFinished downloading all images.")
+        print("Finished downloading all images.")
         self.deduplicate(path)
 
     def download_gifv(self):
@@ -154,9 +154,10 @@ class RedditorDownloader:
             return f.read().splitlines()
 
     def validate_username(self):
-        print("Validating username...")
+        print(f'Validating username "{self.username}"...')
         try:
             self.reddit.redditor(self.username).id
+            print(f'Username "{self.username}" is valid.\n')
             return
         except Exception as e:
             print(f"Error: Invalid username.")
