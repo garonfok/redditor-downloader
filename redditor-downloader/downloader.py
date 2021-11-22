@@ -1,4 +1,3 @@
-from re import sub
 import praw
 import os
 import requests
