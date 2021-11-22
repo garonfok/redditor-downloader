@@ -1,4 +1,5 @@
 import argparse
+import timeit
 from time import sleep
 from datetime import datetime as dt
 from downloader import RedditorDownloader
@@ -47,6 +48,8 @@ def main():
     print()
 
     while True:
+        start_time = timeit.default_timer()
+
         for redditor in redditors:
             print(f"Downloading u/{redditor}'s submissions...")
 
@@ -63,6 +66,9 @@ def main():
 
             print(f"Finished downloading u/{redditor}'s submissions.\n")
 
+        end_time = timeit.default_timer()
+        elapsed_time = end_time - start_time
+        print(f"Finished in {elapsed_time:.2f} seconds.")
         print(f"Finished downloading requested redditor(s) at {dt.now()}")
 
         if not args.continuous:
