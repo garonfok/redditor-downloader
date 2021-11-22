@@ -2,9 +2,7 @@ import argparse
 import time
 from downloader import RedditorDownloader
 
-
-if __name__ == "__main__":
-
+def main():
     default_dir = "./redditor-downloader/downloads"
 
     parser = argparse.ArgumentParser(
@@ -69,3 +67,7 @@ if __name__ == "__main__":
         else:
             print(f"Sleeping for {args.continuous} seconds...")
             time.sleep(args.continuous)
+
+
+if __name__ == "__main__":
+    main()
