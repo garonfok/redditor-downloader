@@ -1,5 +1,5 @@
 import argparse
-import time
+from time import sleep
 from datetime import datetime as dt
 from downloader import RedditorDownloader
 
@@ -69,7 +69,7 @@ def main():
             break
         else:
             print(f"Sleeping for {args.continuous} seconds...")
-            time.sleep(args.continuous)
+            sleep(args.continuous)
 
 
 if __name__ == "__main__":
