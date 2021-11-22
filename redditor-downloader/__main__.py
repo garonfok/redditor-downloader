@@ -55,11 +55,11 @@ def main():
             if not any([args.images, args.gifv, args.videos]):
                 client.download_all()
             if args.images:
-                client.download_images()
+                client.download("images")
             if args.gifv:
-                client.download_gifv()
+                client.download("gifv")
             if args.videos:
-                client.download_videos()
+                client.download("videos")
 
             print(f"Finished downloading u/{redditor}'s submissions.\n")
 

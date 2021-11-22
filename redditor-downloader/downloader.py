@@ -1,3 +1,4 @@
+from re import sub
 import praw
 import os
 import requests
@@ -22,11 +23,11 @@ class RedditorDownloader:
             username=os.environ.get("REDDIT_USERNAME"),
         )
 
-    def download_images(self):
-        print("Fetching images...")
+    def download(self, media_type):
+        print(f"Fetching {media_type}...")
         temp_log = []
         download_log = self.get_log()
-        path = f"{self.download_dir}/images"
+        path = f"{self.download_dir}/{media_type}"
         if not os.path.exists(path):
             os.makedirs(path, exist_ok=True)
         for submission in self.reddit.redditor(self.username).submissions.new(
@@ -37,113 +38,70 @@ class RedditorDownloader:
                 file_name = (
                     f'{self.username}-{time_iso}-{submission.url.split("/")[-1]}'
                 )
-
                 if (
-                    any(i in submission.url for i in ["imgur.com", "i.redd.it"])
-                    and not submission.url.endswith(".gifv")
-                    and submission.url not in download_log
+                    submission.url not in download_log
                     and submission.url not in temp_log
                 ):
-                    if "/a/" in submission.url:
-                        response = requests.get(f"{submission.url}/zip")
-                        with open(f"{path}/{file_name}.zip", "wb") as f:
-                            f.write(response.content)
-                        print(f"Downloaded {submission.url}")
-                        with open(f"{self.download_dir}/downloads.log", "a") as f:
-                            f.write(f"{submission.url}\n")
-                    else:
-                        response = requests.get(submission.url)
-                        with open(f"{path}/{file_name}", "wb") as f:
-                            f.write(response.content)
-                        print(f"Downloaded {submission.url}")
-                        with open(f"{self.download_dir}/downloads.log", "a") as f:
-                            f.write(f"{submission.url}\n")
-                    temp_log.append(submission.url)
-        print("Finished downloading all images.")
-        self.deduplicate(path)
+                    if media_type == "images":
+                        if any(
+                            i in submission.url for i in ["imgur.com", "i.redd.it"]
+                        ):  # Conditional operator broken up to maintain consistency with video/gifv download
+                            if "/a/" in submission.url:
+                                response = requests.get(f"{submission.url}/zip")
+                                with open(f"{path}/{file_name}.zip", "wb") as f:
+                                    f.write(response.content)
+                            else:
+                                response = requests.get(submission.url)
+                                with open(f"{path}/{file_name}", "wb") as f:
+                                    f.write(response.content)
+                            print(f"Downloaded {submission.url}")
+                            self.log(submission.url)
+                            temp_log.append(submission.url)
+                    else:  # Videos and GIFV
+                        yt_opt = {
+                            "outtmpl": f"{path}/{file_name}.%(ext)s",
+                            "quiet": True,
+                            "no_progress": True,
+                            "no_warnings": True,
+                        }
+                        if (
+                            media_type == "gifv"
+                            and any(i in submission.url for i in ["imgur.com"]) # Written for future expandability
+                            and submission.url.endswith(".gifv")
+                        ):
+                            try:
+                                with yt_dlp.YoutubeDL(yt_opt) as ydl:
+                                    ydl.download([submission.url])
+                                print(f"Downloaded {submission.url}")
+                            except Exception as e:
+                                print(e)
+                            self.log(submission.url)
+                            temp_log.append(submission.url)
+                        elif media_type == "videos" and any(
+                            i in submission.url
+                            for i in [
+                                "v.redd.it",
+                                "i.redd.it",
+                                "gifycat.com",
+                                "redgifs.com",
+                            ]
+                        ):
+                            try:
+                                with yt_dlp.YoutubeDL(yt_opt) as ydl:
+                                    ydl.download([submission.url])
+                                print(f"Downloaded {submission.url}")
+                            except Exception as e:
+                                print(e)
+                            self.log(submission.url)
+                            temp_log.append(submission.url)
 
-    def download_gifv(self):
-        print("Fetching gifv files...")
-        temp_log = []
-        download_log = self.get_log()
-        path = f"{self.download_dir}/gifv"
-        if not os.path.exists(path):
-            os.makedirs(path, exist_ok=True)
-        for submission in self.reddit.redditor(self.username).submissions.new(
-            limit=None
-        ):
-            if submission.is_self is False:
-                time_iso = dt.utcfromtimestamp(submission.created_utc).isoformat()
-                file_name = (
-                    f'{self.username}-{time_iso}-{submission.url.split("/")[-1]}'
-                )
-                yt_opt = {
-                    "outtmpl": f"{path}/{file_name}.%(ext)s",
-                    "quiet": True,
-                    "no_progress": True,
-                    "no_warnings": True,
-                }
-
-                if (
-                    "imgur.com" in submission.url
-                    and submission.url.endswith(".gifv")
-                    and submission.url not in download_log
-                    and submission.url not in temp_log
-                ):
-                    try:
-                        with yt_dlp.YoutubeDL(yt_opt) as ydl:
-                            ydl.download([submission.url])
-                        print(f"Downloaded {submission.url}")
-                    except Exception as e:
-                        print(e)
-                    print(f"Downloaded {submission.url}")
-                    with open(f"{self.download_dir}/downloads.log", "a") as f:
-                        f.write(f"{submission.url}\n")
-                    temp_log.append(submission.url)
-        print("Finished downloading all gifv files as .mp4.")
-        self.deduplicate(path)
-
-    def download_videos(self):
-        print("Fetching videos...")
-        temp_log = []
-        download_log = self.get_log()
-        path = f"{self.download_dir}/videos"
-        if not os.path.exists(path):
-            os.makedirs(path, exist_ok=True)
-        for submission in self.reddit.redditor(self.username).submissions.new(
-            limit=None
-        ):
-            if submission.is_self is False:
-                time_iso = dt.utcfromtimestamp(submission.created_utc).isoformat()
-                video_id = submission.url.split("/")[-1]
-                file_name = f"{self.username}-{time_iso}-{video_id}"
-                yt_opt = {
-                    "outtmpl": f"{path}/{file_name}.%(ext)s",
-                    "quiet": True,
-                    "no_progress": True,
-                    "no_warnings": True,
-                }
-                if (
-                    any(i in submission.url for i in ["i.redd.it", "redgifs.com"])
-                    and submission.url not in download_log
-                    and submission.url not in temp_log
-                ):
-                    try:
-                        with yt_dlp.YoutubeDL(yt_opt) as ydl:
-                            ydl.download([submission.url])
-                        print(f"Downloaded {submission.url}")
-                    except Exception as e:
-                        print(e)
-                    self.log(submission.url)
-                    temp_log.append(submission.url)
-
-        print("Finished downloading all videos.")
+        print(f"Finished downloading {media_type}.")
         self.deduplicate(path)
 
     def download_all(self):
-        self.download_images()
-        self.download_gifv()
-        self.download_videos()
+        self.download("images")
+        self.download("gifv")
+        self.download("videos")
 
     def log(self, link):
         with open(f"{self.download_dir}/downloads.log", "a") as f:
