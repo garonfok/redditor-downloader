@@ -3,7 +3,7 @@ import os
 import requests
 import sys
 import yt_dlp
-from datetime import datetime
+from datetime import datetime as dt
 from dotenv import load_dotenv
 from hashlib import md5
 
@@ -33,7 +33,7 @@ class RedditorDownloader:
             limit=None
         ):
             if submission.is_self is False:
-                time_iso = datetime.utcfromtimestamp(submission.created_utc).isoformat()
+                time_iso = dt.utcfromtimestamp(submission.created_utc).isoformat()
                 file_name = (
                     f'{self.username}-{time_iso}-{submission.url.split("/")[-1]}'
                 )
@@ -73,7 +73,7 @@ class RedditorDownloader:
             limit=None
         ):
             if submission.is_self is False:
-                time_iso = datetime.utcfromtimestamp(submission.created_utc).isoformat()
+                time_iso = dt.utcfromtimestamp(submission.created_utc).isoformat()
                 file_name = (
                     f'{self.username}-{time_iso}-{submission.url.split("/")[-1]}'
                 )
@@ -114,7 +114,7 @@ class RedditorDownloader:
             limit=None
         ):
             if submission.is_self is False:
-                time_iso = datetime.utcfromtimestamp(submission.created_utc).isoformat()
+                time_iso = dt.utcfromtimestamp(submission.created_utc).isoformat()
                 video_id = submission.url.split("/")[-1]
                 file_name = f"{self.username}-{time_iso}-{video_id}"
                 yt_opt = {
