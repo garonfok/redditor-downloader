@@ -1,5 +1,6 @@
 import argparse
 import time
+from datetime import datetime as dt
 from downloader import RedditorDownloader
 
 def main():
@@ -61,6 +62,8 @@ def main():
                 client.download_videos()
 
             print(f"Finished downloading u/{redditor}'s submissions.\n")
+
+        print(f"Finished downloading requested redditor(s) at {dt.now()}")
 
         if not args.continuous:
             break
