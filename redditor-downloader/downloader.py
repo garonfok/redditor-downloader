@@ -44,6 +44,8 @@ class RedditorDownloader:
                 if media_type == "images":
                     if any(
                         i in submission.url for i in ["imgur.com", "i.redd.it"]
+                    ) and not submission.url.endswith(
+                        ".gifv"
                     ):  # Conditional operator broken up to maintain consistency with video/gifv download
                         if "/a/" in submission.url:
                             response = requests.get(f"{submission.url}/zip")
