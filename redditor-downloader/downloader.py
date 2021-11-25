@@ -39,7 +39,7 @@ class RedditorDownloader:
             ):
                 time_iso = dt.utcfromtimestamp(submission.created_utc).isoformat()
                 file_name = (
-                    f'{self.username}-{time_iso}-{submission.url.split("/")[-1]}'
+                    f'{time_iso}-{self.username}-{submission.url.split("/")[-1]}'
                 )
                 if media_type == "images":
                     if any(
