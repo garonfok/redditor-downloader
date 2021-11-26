@@ -37,7 +37,7 @@ class RedditorDownloader:
                 and submission.url not in download_log
                 and submission.url not in temp_log
             ):
-                time_iso = dt.utcfromtimestamp(submission.created_utc).isoformat()
+                time_iso = dt.utcfromtimestamp(submission.created_utc).isoformat().replace(":",".")
                 file_name = (
                     f'{time_iso}-{self.username}-{submission.url.split("/")[-1]}'
                 )
