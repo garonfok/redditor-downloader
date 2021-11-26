@@ -11,6 +11,7 @@ praw = "^7.4.0"
 requests = "^2.26.0"
 python-dotenv = "^0.19.1"
 yt-dlp = "^2021.10.22"
+toml = "^0.10.2"
 
 [tool.poetry.dev-dependencies]
 black = {version = "^21.10b0", allow-prereleases = true}
