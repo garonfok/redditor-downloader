@@ -19,22 +19,22 @@ def main():
         "-v", "--version", help="show version", action="version", version=(__version__)
     )
     parser.add_argument(
-        "username", nargs="+", help="the username(s) of the reddit user to download."
+        "username", nargs="+", help="the username(s) of the reddit user to download"
     )
     parser.add_argument(
         "-p",
         "--path",
         default=default_dir,
-        help=f"the path to download the submissions to (default path: '{default_dir}').",
+        help=f"the path to download the submissions to (default path: '{default_dir}')",
     )
     parser.add_argument(
-        "-I", "--images", help="download images only", action="store_true"
+        "-I", "--images", help="download image only", action="store_true"
     )
     parser.add_argument(
-        "-G", "--gifv", help="download GIFV files only", action="store_true"
+        "-G", "--gifv", help="download GIFV only", action="store_true"
     )
     parser.add_argument(
-        "-V", "--videos", help="download videos only", action="store_true"
+        "-V", "--videos", help="download video only", action="store_true"
     )
     parser.add_argument(
         "-c",
