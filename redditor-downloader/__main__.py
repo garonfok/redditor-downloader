@@ -1,14 +1,22 @@
 import argparse
 import timeit
+import toml
 from time import sleep
 from datetime import datetime as dt
 from downloader import RedditorDownloader
 
+
 def main():
+
+    __version__ = toml.load("pyproject.toml")["tool"]["poetry"]["version"]
+
     default_dir = "./redditor-downloader/downloads"
 
     parser = argparse.ArgumentParser(
         description="Downloads all of a reddit user's image/video submissions."
+    )
+    parser.add_argument(
+        "-v", "--version", help="show version", action="version", version=(__version__)
     )
     parser.add_argument(
         "username", nargs="+", help="the username(s) of the reddit user to download."
