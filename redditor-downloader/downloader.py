@@ -24,8 +24,8 @@ class RedditorDownloader:
 
     def download(self, media_type):
         print(f"Fetching {media_type}...")
-        temp_log = []
-        download_log = self.get_log()
+        temp_log = [] # Account for duplicate posts/crossposts
+        download_log = self.get_log() # Permanently account for duplicate posts/crossposts
         path = f"{self.download_dir}/{media_type}"
         if not os.path.exists(path):
             os.makedirs(path, exist_ok=True)
@@ -37,7 +37,7 @@ class RedditorDownloader:
                 and submission.url not in download_log
                 and submission.url not in temp_log
             ):
-                time_iso = dt.utcfromtimestamp(submission.created_utc).isoformat().replace(":",".")
+                time_iso = dt.utcfromtimestamp(submission.created_utc).isoformat().replace(":",".") # Modified ISO8601 Format (YYYY-DD-MMTHH.MM.SS) for file parsing
                 file_name = (
                     f'{time_iso}-{self.username}-{submission.url.split("/")[-1]}'
                 )
@@ -48,7 +48,7 @@ class RedditorDownloader:
                         ".gifv"
                     ):  # Conditional operator broken up to maintain consistency with video/gifv download
                         if "/a/" in submission.url:
-                            response = requests.get(f"{submission.url}/zip")
+                            response = requests.get(f"{submission.url}/zip") # TODO: Fix handling Imgur albums, currently inconsistent support
                             with open(f"{path}/{file_name}.zip", "wb") as f:
                                 f.write(response.content)
                         else:
