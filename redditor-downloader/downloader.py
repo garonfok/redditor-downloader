@@ -56,7 +56,6 @@ class RedditorDownloader:
                             with open(f"{path}/{file_name}", "wb") as f:
                                 f.write(response.content)
                         print(f"Downloaded {submission.url}")
-                        self.log(submission.url)
                         temp_log.append(submission.url)
                 else:  # Videos and GIFV
                     yt_opt = {
@@ -78,7 +77,6 @@ class RedditorDownloader:
                             print(f"Downloaded {submission.url}")
                         except Exception as e:
                             print(e)
-                        self.log(submission.url)
                         temp_log.append(submission.url)
                     elif media_type == "videos" and any(
                         i in submission.url
@@ -95,9 +93,9 @@ class RedditorDownloader:
                             print(f"Downloaded {submission.url}")
                         except Exception as e:
                             print(e)
-                        self.log(submission.url)
                         temp_log.append(submission.url)
-
+        for _ in temp_log:
+            self.log(_)
         print(f"Finished downloading {media_type}.")
         self.deduplicate(path)
 
