@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "redditor-downloader"
-version = "0.1.0"
+version = "2.0.0"
 description = "Scrapes a redditor's post history and downloads all images, gifs, and videos"
 authors = ["Garon Fok <fokgaron@gmail.com>"]
 license = "MIT"
