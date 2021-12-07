@@ -30,9 +30,7 @@ def main():
     parser.add_argument(
         "-I", "--images", help="download image only", action="store_true"
     )
-    parser.add_argument(
-        "-G", "--gifv", help="download GIFV only", action="store_true"
-    )
+    parser.add_argument("-G", "--gifv", help="download GIFV only", action="store_true")
     parser.add_argument(
         "-V", "--videos", help="download video only", action="store_true"
     )
