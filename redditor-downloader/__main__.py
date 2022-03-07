@@ -28,11 +28,28 @@ def main():
         help=f"the path to download the submissions to (default path: '{default_dir}')",
     )
     parser.add_argument(
-        "-I", "--images", help="download image only", action="store_true"
+        "-I",
+        "--images",
+        help="download image only",
+        action="store_const",
+        const=4,
+        default=0,
     )
-    parser.add_argument("-G", "--gifv", help="download GIFV only", action="store_true")
     parser.add_argument(
-        "-V", "--videos", help="download video only", action="store_true"
+        "-G",
+        "--gifv",
+        help="download GIFV only",
+        action="store_const",
+        const=2,
+        default=0,
+    )
+    parser.add_argument(
+        "-V",
+        "--videos",
+        help="download video only",
+        action="store_const",
+        const=1,
+        default=0,
     )
     parser.add_argument(
         "-c",
@@ -61,14 +78,10 @@ def main():
 
             client = RedditorDownloader(redditor, chosen_dir)
 
-            if not any([args.images, args.gifv, args.videos]):
-                client.download_all()
-            if args.images:
-                client.download("images")
-            if args.gifv:
-                client.download("gifv")
-            if args.videos:
-                client.download("videos")
+            # Uses the data schema of chmod UNIX permissions, which will then be converted to binary for flag parsing
+            flag_total = args.images + args.gifv + args.videos
+            download_flags = 7 if flag_total == 0 else flag_total
+            client.download(download_flags)
 
             print(f"Finished downloading u/{redditor}'s submissions.\n")
 

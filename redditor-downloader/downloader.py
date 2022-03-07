@@ -22,21 +22,22 @@ class RedditorDownloader:
             username=os.environ.get("REDDIT_USERNAME"),
         )
 
-    def download(self, media_type):
-        print(f"Fetching {media_type}...")
+    def download(self, download_flags: int):
+        print(f"Fetching posts...")
         temp_log = []  # Account for duplicate posts/crossposts
         download_log = (
             self.get_log()
         )  # Permanently account for duplicate posts/crossposts
-        path = f"{self.download_dir}/{media_type}"
+        bin_flags = bin(download_flags)[2::]  # Convert to binary
         for submission in self.reddit.redditor(self.username).submissions.new(
             limit=None
         ):
             if (
-                submission.is_self is False
+                submission.is_self is False  # Check if post is text only
                 and submission.url not in download_log
                 and submission.url not in temp_log
             ):
+
                 time_iso = (
                     dt.utcfromtimestamp(submission.created_utc)
                     .isoformat()
@@ -45,70 +46,76 @@ class RedditorDownloader:
                 file_name = (
                     f'{time_iso}-{self.username}-{submission.url.split("/")[-1]}'
                 )
-                if media_type == "images":
-                    if any(
-                        i in submission.url for i in ["imgur.com", "i.redd.it"]
-                    ) and not submission.url.endswith(
-                        ".gifv"
-                    ):  # Conditional operator broken up to maintain consistency with video/gifv download
-                        if "/a/" in submission.url:
-                            response = requests.get(
-                                f"{submission.url}/zip"
-                            )  # TODO: Fix handling Imgur albums, currently inconsistent support
-                            with open(f"{path}/{file_name}.zip", "wb") as f:
-                                f.write(response.content)
-                        else:
-                            response = requests.get(submission.url)
-                            with open(f"{path}/{file_name}", "wb") as f:
-                                f.write(response.content)
-                        print(f"Downloaded {submission.url}")
-                        temp_log.append(submission.url)
-                else:  # Videos and GIFV
+
+                if (
+                    bin_flags[0] == "1"
+                    and any(i in submission.url for i in ["imgur.com", "i.redd.it"])
+                    and not submission.url.endswith(".gifv")
+                ):  # Check if post is an image
+                    path = f"{self.download_dir}/images"
+                    if "/a/" in submission.url:  # Check if post is an image album
+                        response = requests.get(
+                            f"{submission.url}/zip"
+                        )  # TODO: Fix handling Imgur albums, currently inconsistent support
+                        with open(f"{path}/{file_name}.zip", "wb") as f:
+                            f.write(response.content)
+                    else:
+                        response = requests.get(submission.url)
+                        with open(f"{path}/{file_name}", "wb") as f:
+                            f.write(response.content)
+                    print(f"Downloaded {submission.url}")
+                    temp_log.append(submission.url)
+                if (
+                    bin_flags[1] == "1"
+                    and any(i in submission.url for i in ["imgur.com"])
+                    and submission.url.endswith(".gifv")
+                ): # Check if post is a gifv
+                    path = f"{self.download_dir}/gifv"
                     yt_opt = {
                         "outtmpl": f"{path}/{file_name}.%(ext)s",
                         "quiet": True,
                         "no_progress": True,
                         "no_warnings": True,
                     }
-                    if (
-                        media_type == "gifv"
-                        and any(
-                            i in submission.url for i in ["imgur.com"]
-                        )  # Written for future expandability
-                        and submission.url.endswith(".gifv")
-                    ):
-                        try:
-                            with yt_dlp.YoutubeDL(yt_opt) as ydl:
-                                ydl.download([submission.url])
-                            print(f"Downloaded {submission.url}")
-                        except Exception as e:
-                            print(e)
-                        temp_log.append(submission.url)
-                    elif media_type == "videos" and any(
-                        i in submission.url
-                        for i in [
-                            "v.redd.it",
-                            "i.redd.it",
-                            "gifycat.com",
-                            "redgifs.com",
-                        ]
-                    ):
-                        try:
-                            with yt_dlp.YoutubeDL(yt_opt) as ydl:
-                                ydl.download([submission.url])
-                            print(f"Downloaded {submission.url}")
-                        except Exception as e:
-                            print(e)
-                        temp_log.append(submission.url)
+                    try:
+                        with yt_dlp.YoutubeDL(yt_opt) as ydl:
+                            ydl.download([submission.url])
+                        print(f"Downloaded {submission.url}")
+                    except Exception as e:
+                        print(e)
+                    temp_log.append(submission.url)
+                if bin_flags[2] == "1" and any(
+                    i in submission.url
+                    for i in [
+                        "v.redd.it",
+                        "gifycat.com",
+                        "redgifs.com",
+                    ]
+                ): # Check if post is a video
+                    path = f"{self.download_dir}/videos"
+                    yt_opt = {
+                        "outtmpl": f"{path}/{file_name}.%(ext)s",
+                        "quiet": True,
+                        "no_progress": True,
+                        "no_warnings": True,
+                    }
+                    try:
+                        with yt_dlp.YoutubeDL(yt_opt) as ydl:
+                            ydl.download([submission.url])
+                        print(f"Downloaded {submission.url}")
+                    except Exception as e:
+                        print(e)
+                    temp_log.append(submission.url)
         for _ in temp_log:
             self.log(_)
-        print(f"Finished downloading {media_type}.")
-        self.deduplicate(path)
+        print(f"Finished downloading posts.")
 
-    def download_all(self):
-        self.download("images")
-        self.download("gifv")
-        self.download("videos")
+        if bin_flags[0] == "1":
+            self.deduplicate(f"{self.download_dir}/images")
+        if bin_flags[1] == "1":
+            self.deduplicate(f"{self.download_dir}/gifv")
+        if bin_flags[2] == "1":
+            self.deduplicate(f"{self.download_dir}/videos")
 
     def log(self, link):
         with open(f"{self.download_dir}/downloads.log", "a") as f:
