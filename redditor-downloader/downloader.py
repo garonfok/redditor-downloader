@@ -29,8 +29,6 @@ class RedditorDownloader:
             self.get_log()
         )  # Permanently account for duplicate posts/crossposts
         path = f"{self.download_dir}/{media_type}"
-        if not os.path.exists(path):
-            os.makedirs(path, exist_ok=True)
         for submission in self.reddit.redditor(self.username).submissions.new(
             limit=None
         ):
@@ -136,6 +134,14 @@ class RedditorDownloader:
         if not os.path.exists(f"{self.download_dir}/downloads.log"):
             with open(f"{self.download_dir}/downloads.log", "w") as f:
                 f.write("")
+        paths = [
+            f"{self.download_dir}/images",
+            f"{self.download_dir}/gifv",
+            f"{self.download_dir}/videos",
+        ]
+        for path in paths:
+            if not os.path.exists(path):
+                os.makedirs(path, exist_ok=True)
 
     def deduplicate(self, path):
         print("Deduplicating...")
