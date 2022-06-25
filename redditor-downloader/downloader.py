@@ -132,6 +132,7 @@ class RedditorDownloader:
             print(f'Username "{self.username}" is valid.')
             return
         except Exception as e:
+            print(e)
             print(f"Error: Invalid username.")
             sys.exit(1)
 
